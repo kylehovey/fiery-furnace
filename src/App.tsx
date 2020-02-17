@@ -1,11 +1,11 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Map from './components/map';
 
 class App extends React.Component {
   render() {
     return (
-      <h1>TODO</h1>
+      <Map />
     );
   }
 }
