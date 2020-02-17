@@ -13,3 +13,30 @@
 .tooltip > img {
   width: 200px;
 }
+
+.overlay {
+  position: absolute;
+  z-index: 2;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding-top: 1rem;
+}
+
+.overlay > button {
+  position: absolute;
+  background: rgba(0, 0, 0, 0);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  top: 10px;
+  right: 10px;
+}
+
+.overlay > img {
+  height: 90vh;
+}

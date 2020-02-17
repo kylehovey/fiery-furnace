@@ -30,6 +30,8 @@ interface State {
   readonly viewport: Viewport;
   readonly hoveredFeature: Feature | null;
   readonly hoveredLocation: Location | null;
+  readonly tooltipShown: boolean;
+  readonly overlayShown: boolean;
 }
 
 export default class extends React.Component<{}, State> {
@@ -43,25 +45,24 @@ export default class extends React.Component<{}, State> {
     },
     hoveredFeature: null,
     hoveredLocation: null,
+    tooltipShown: false,
+    overlayShown: false,
   };
 
   setViewport = (viewport: Viewport): void => {
-    this.resetHover();
+    this.setState({ tooltipShown: false });
     this.setState({ viewport });
   }
 
-  resetHover = (): void => {
-    this.setState({
-      hoveredFeature: null,
-      hoveredLocation: null,
-    });
-  }
-
   onHover = ({ features, srcEvent }: PointerEvent): void => {
+    const { overlayShown } = this.state;
     const { offsetX, offsetY } = srcEvent;
 
+    // Ignore hover while overlay is open
+    if (overlayShown) return;
+
     if (features === undefined) {
-      this.resetHover();
+      this.setState({ tooltipShown: false });
 
       return;
     };
@@ -69,12 +70,13 @@ export default class extends React.Component<{}, State> {
     const hoveredFeature = features.find(({ source }) => source === 'pictures');
 
     if (hoveredFeature === undefined) {
-      this.resetHover();
+      this.setState({ tooltipShown: false });
 
       return;
     };
 
     this.setState({
+      tooltipShown: true,
       hoveredFeature,
       hoveredLocation: {
         x: offsetX,
@@ -93,9 +95,23 @@ export default class extends React.Component<{}, State> {
     return 'pointer';
   }
 
-  get tooltip() {
-    const { hoveredFeature, hoveredLocation } = this.state;
+  onClick = (): void => {
+    const { overlayShown, hoveredFeature, hoveredLocation } = this.state;
 
+    // Ignore clicks while overlay is open
+    if (overlayShown) return;
+
+    if (hoveredFeature === null || hoveredLocation === null) {
+      return;
+    };
+
+    this.openOverlay();
+  }
+
+  get tooltip() {
+    const { tooltipShown, hoveredFeature, hoveredLocation } = this.state;
+
+    if (!tooltipShown) return null;
     if (hoveredFeature === null || hoveredLocation === null) return null;
 
     const name = hoveredFeature.properties && hoveredFeature.properties.name;
@@ -108,6 +124,36 @@ export default class extends React.Component<{}, State> {
     );
   }
 
+  openOverlay = () => this.setState({
+    overlayShown: true,
+    tooltipShown: false,
+  });
+
+  closeOverlay = () => this.setState({
+    overlayShown: false,
+    hoveredFeature: null,
+    hoveredLocation: null,
+  });
+
+  get overlay() {
+    const { overlayShown } = this.state;
+
+    if (!overlayShown) return null;
+
+    const { hoveredFeature } = this.state;
+
+    if (hoveredFeature === null) return null;
+
+    const name = hoveredFeature.properties && hoveredFeature.properties.name;
+
+    return (
+      <div className="overlay">
+        <button onClick={this.closeOverlay}>X</button>
+        <img src={require(`../images/IMG_${name}.jpg`)} />
+      </div>
+    );
+  }
+
   render() {
     return (
       <ReactMapGL
@@ -115,6 +161,7 @@ export default class extends React.Component<{}, State> {
         mapStyle="mapbox://styles/mapbox/satellite-v9"
         onViewportChange={this.setViewport}
         onHover={this.onHover}
+        onClick={this.onClick}
         getCursor={this.getCursor}
         mapboxApiAccessToken="pk.eyJ1IjoidXBlbCIsImEiOiJjajllZ29reTUyYTJoMndsc3ZtdGg2NXpsIn0.Y6sKlsUA9ZIm8rHfklQPaQ"
       >
@@ -152,6 +199,7 @@ export default class extends React.Component<{}, State> {
           />
         </Source>
         {this.tooltip}
+        {this.overlay}
       </ReactMapGL>
     );
   }
