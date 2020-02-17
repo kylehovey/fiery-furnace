@@ -83,6 +83,16 @@ export default class extends React.Component<{}, State> {
     });
   }
 
+  getCursor = (): string => {
+    const { hoveredFeature, hoveredLocation } = this.state;
+
+    if (hoveredFeature === null || hoveredLocation === null) {
+      return 'default';
+    };
+
+    return 'pointer';
+  }
+
   get tooltip() {
     const { hoveredFeature, hoveredLocation } = this.state;
 
@@ -105,6 +115,7 @@ export default class extends React.Component<{}, State> {
         mapStyle="mapbox://styles/mapbox/satellite-v9"
         onViewportChange={this.setViewport}
         onHover={this.onHover}
+        getCursor={this.getCursor}
         mapboxApiAccessToken="pk.eyJ1IjoidXBlbCIsImEiOiJjajllZ29reTUyYTJoMndsc3ZtdGg2NXpsIn0.Y6sKlsUA9ZIm8rHfklQPaQ"
       >
         <Source id='route' type="geojson" data={Data} lineMetrics>
