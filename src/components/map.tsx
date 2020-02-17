@@ -49,6 +49,20 @@ export default class extends React.Component<{}, State> {
     overlayShown: false,
   };
 
+  componentDidMount() {
+    window.addEventListener("resize", this.resizeMap);
+  }
+
+  resizeMap = (): void => {
+    this.setState(({ viewport }) => ({
+      viewport: {
+        ...viewport,
+        width: window.innerWidth,
+        height: window.innerWidth,
+      },
+    }));
+  }
+
   setViewport = (viewport: Viewport): void => {
     this.setState({ tooltipShown: false });
     this.setState({ viewport });
