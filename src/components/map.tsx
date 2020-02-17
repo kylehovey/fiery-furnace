@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { Feature, LineString } from 'geojson';
 import TrackData from '../data/route.json';
+import ImagePoints from '../builders/image_points';
 
 const Data: Feature<LineString> = {
   type: 'Feature',
@@ -67,6 +68,16 @@ export default class extends React.Component<{}, State> {
                 '#8b02e9'
               ],
               'line-width': 5,
+            }}
+          />
+        </Source>
+        <Source type="geojson" data={ImagePoints}>
+          <Layer
+            id="pictures"
+            type="circle"
+            paint={{
+              'circle-radius': 6,
+              'circle-color': '#ea5700',
             }}
           />
         </Source>
