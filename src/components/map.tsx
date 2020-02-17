@@ -86,7 +86,11 @@ export default class extends React.Component<{}, State> {
   }
 
   getCursor = (): string => {
-    const { hoveredFeature, hoveredLocation } = this.state;
+    const { overlayShown, hoveredFeature, hoveredLocation } = this.state;
+
+    if (overlayShown) {
+      return 'default';
+    }
 
     if (hoveredFeature === null || hoveredLocation === null) {
       return 'default';
@@ -136,18 +140,14 @@ export default class extends React.Component<{}, State> {
   });
 
   get overlay() {
-    const { overlayShown } = this.state;
-
-    if (!overlayShown) return null;
-
-    const { hoveredFeature } = this.state;
+    const { overlayShown, hoveredFeature } = this.state;
 
     if (hoveredFeature === null) return null;
 
     const name = hoveredFeature.properties && hoveredFeature.properties.name;
 
     return (
-      <div className="overlay">
+      <div className={`overlay${overlayShown ? ' shown' : ''}`}>
         <button onClick={this.closeOverlay}>X</button>
         <img src={require(`../images/IMG_${name}.jpg`)} />
       </div>
